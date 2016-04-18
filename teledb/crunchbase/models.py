@@ -3,7 +3,7 @@
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey has `on_delete` set to the desidered behavior.
-#   * Remove `managed = True` lines if you wish to allow Django to create, modify, and delete the table
+#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from __future__ import unicode_literals
 
@@ -25,7 +25,6 @@ class CbAcquisitions(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_acquisitions'
 
 
@@ -40,38 +39,10 @@ class CbDegrees(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_degrees'
 
 
-class CbFundingRounds(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    funding_round_id = models.BigIntegerField()
-    object_id = models.CharField(max_length=64)
-    funded_at = models.DateField(blank=True, null=True)
-    funding_round_type = models.CharField(max_length=32, blank=True, null=True)
-    funding_round_code = models.CharField(max_length=32, blank=True, null=True)
-    raised_amount_usd = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    raised_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    raised_currency_code = models.CharField(max_length=3, blank=True, null=True)
-    pre_money_valuation_usd = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    pre_money_valuation = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    pre_money_currency_code = models.CharField(max_length=3, blank=True, null=True)
-    post_money_valuation_usd = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    post_money_valuation = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    post_money_currency_code = models.CharField(max_length=3, blank=True, null=True)
-    participants = models.IntegerField(blank=True, null=True)
-    is_first_round = models.IntegerField(blank=True, null=True)
-    is_last_round = models.IntegerField(blank=True, null=True)
-    source_url = models.CharField(max_length=255, blank=True, null=True)
-    source_description = models.CharField(max_length=255, blank=True, null=True)
-    created_by = models.CharField(max_length=64, blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
 
-    class Meta:
-        managed = True
-        db_table = 'cb_funding_rounds'
 
 
 class CbFunds(models.Model):
@@ -88,7 +59,6 @@ class CbFunds(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_funds'
 
 
@@ -101,7 +71,6 @@ class CbInvestments(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_investments'
 
 
@@ -121,7 +90,6 @@ class CbIpos(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_ipos'
 
 
@@ -137,7 +105,6 @@ class CbMilestones(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_milestones'
 
 
@@ -184,10 +151,37 @@ class CbObjects(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_objects'
         unique_together = (('entity_type', 'entity_id'),)
 
+class CbFundingRounds(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    funding_round_id = models.BigIntegerField()
+    #object_id = models.CharField(max_length=64)
+    object = models.ForeignKey(CbObjects, related_name='CbFundingRounds')
+    funded_at = models.DateField(blank=True, null=True)
+    funding_round_type = models.CharField(max_length=32, blank=True, null=True)
+    funding_round_code = models.CharField(max_length=32, blank=True, null=True)
+    raised_amount_usd = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    raised_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    raised_currency_code = models.CharField(max_length=3, blank=True, null=True)
+    pre_money_valuation_usd = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    pre_money_valuation = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    pre_money_currency_code = models.CharField(max_length=3, blank=True, null=True)
+    post_money_valuation_usd = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    post_money_valuation = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    post_money_currency_code = models.CharField(max_length=3, blank=True, null=True)
+    participants = models.IntegerField(blank=True, null=True)
+    is_first_round = models.IntegerField(blank=True, null=True)
+    is_last_round = models.IntegerField(blank=True, null=True)
+    source_url = models.CharField(max_length=255, blank=True, null=True)
+    source_description = models.CharField(max_length=255, blank=True, null=True)
+    created_by = models.CharField(max_length=64, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'cb_funding_rounds'
 
 class CbOffices(models.Model):
     id = models.BigIntegerField(primary_key=True)
@@ -207,7 +201,6 @@ class CbOffices(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_offices'
 
 
@@ -220,7 +213,6 @@ class CbPeople(models.Model):
     affiliation_name = models.CharField(max_length=128, blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_people'
 
 
@@ -238,5 +230,4 @@ class CbRelationships(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = True
         db_table = 'cb_relationships'

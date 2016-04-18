@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'teledb.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mysampledb',
+        'NAME': 'crunchdb',
         'USER': 'root',
         'PASSWORD': '19910602',
     }
