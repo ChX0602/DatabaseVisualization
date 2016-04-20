@@ -4,7 +4,9 @@
 
 
 1. This query returns the educational institutions of members of first 5 companies that receives series-b funding.
-`query {
+
+```
+query {
   allFundingRounds(fundingRoundType:"series-b", first:5){
     edges {
       node {
@@ -29,9 +31,11 @@
     }
   }
 }
-`
+```
+
 And the result will be of the following format:
-`
+
+```
 {
   "data": {
     "allFundingRounds": {
@@ -72,5 +76,5 @@ And the result will be of the following format:
                                 .
                                 .
                                 .
-`
+```
 
