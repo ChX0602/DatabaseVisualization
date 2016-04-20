@@ -10,104 +10,6 @@ from __future__ import unicode_literals
 from django.db import models
 
 
-class CbAcquisitions(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    acquisition_id = models.BigIntegerField()
-    acquiring_object_id = models.CharField(max_length=64)
-    acquired_object_id = models.CharField(max_length=64)
-    term_code = models.CharField(max_length=16, blank=True, null=True)
-    price_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    price_currency_code = models.CharField(max_length=16, blank=True, null=True)
-    acquired_at = models.DateField(blank=True, null=True)
-    source_url = models.CharField(max_length=255, blank=True, null=True)
-    source_description = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'cb_acquisitions'
-
-
-class CbDegrees(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    object_id = models.CharField(max_length=64)
-    degree_type = models.CharField(max_length=32)
-    subject = models.CharField(max_length=255, blank=True, null=True)
-    institution = models.CharField(max_length=64, blank=True, null=True)
-    graduated_at = models.DateField(blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'cb_degrees'
-
-
-
-
-
-class CbFunds(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    fund_id = models.BigIntegerField()
-    object_id = models.CharField(max_length=64)
-    name = models.CharField(max_length=255)
-    funded_at = models.DateField(blank=True, null=True)
-    raised_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    raised_currency_code = models.CharField(max_length=3, blank=True, null=True)
-    source_url = models.CharField(max_length=255, blank=True, null=True)
-    source_description = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'cb_funds'
-
-
-class CbInvestments(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    funding_round_id = models.BigIntegerField()
-    funded_object_id = models.CharField(max_length=64)
-    investor_object_id = models.CharField(max_length=64)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'cb_investments'
-
-
-class CbIpos(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    ipo_id = models.BigIntegerField()
-    object_id = models.CharField(max_length=64)
-    valuation_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    valuation_currency_code = models.CharField(max_length=16, blank=True, null=True)
-    raised_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
-    raised_currency_code = models.CharField(max_length=16, blank=True, null=True)
-    public_at = models.DateField(blank=True, null=True)
-    stock_symbol = models.CharField(max_length=32, blank=True, null=True)
-    source_url = models.CharField(max_length=255, blank=True, null=True)
-    source_description = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'cb_ipos'
-
-
-class CbMilestones(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    object_id = models.CharField(max_length=64)
-    milestone_at = models.DateField(blank=True, null=True)
-    milestone_code = models.CharField(max_length=32, blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    source_url = models.CharField(max_length=255, blank=True, null=True)
-    source_description = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        db_table = 'cb_milestones'
-
-
 class CbObjects(models.Model):
     id = models.CharField(primary_key=True, max_length=64)
     entity_type = models.CharField(max_length=16)
@@ -149,16 +51,55 @@ class CbObjects(models.Model):
     created_by = models.CharField(max_length=64, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
-
+    employments = models.ManyToManyField('self', through='CbRelationships', symmetrical=False)
     class Meta:
         db_table = 'cb_objects'
         unique_together = (('entity_type', 'entity_id'),)
+
+
+class CbAcquisitions(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    acquisition_id = models.BigIntegerField()
+    #acquiring_object_id = models.CharField(max_length=64)
+    #acquired_object_id = models.CharField(max_length=64)
+    acquiring_object = models.ForeignKey(CbObjects, related_name='RNacquiring')
+    acquired_object = models.ForeignKey(CbObjects, related_name='RNacquired')
+    term_code = models.CharField(max_length=16, blank=True, null=True)
+    price_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    price_currency_code = models.CharField(max_length=16, blank=True, null=True)
+    acquired_at = models.DateField(blank=True, null=True)
+    source_url = models.CharField(max_length=255, blank=True, null=True)
+    source_description = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'cb_acquisitions'
+
+
+class CbFunds(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    fund_id = models.BigIntegerField()
+    #object_id = models.CharField(max_length=64)
+    object = models.ForeignKey(CbObjects)
+    name = models.CharField(max_length=255)
+    funded_at = models.DateField(blank=True, null=True)
+    raised_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    raised_currency_code = models.CharField(max_length=3, blank=True, null=True)
+    source_url = models.CharField(max_length=255, blank=True, null=True)
+    source_description = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'cb_funds'
+
 
 class CbFundingRounds(models.Model):
     id = models.BigIntegerField(primary_key=True)
     funding_round_id = models.BigIntegerField()
     #object_id = models.CharField(max_length=64)
-    object = models.ForeignKey(CbObjects, related_name='CbFundingRounds')
+    object = models.ForeignKey(CbObjects, related_name='RNfundingRounds')
     funded_at = models.DateField(blank=True, null=True)
     funding_round_type = models.CharField(max_length=32, blank=True, null=True)
     funding_round_code = models.CharField(max_length=32, blank=True, null=True)
@@ -183,9 +124,77 @@ class CbFundingRounds(models.Model):
     class Meta:
         db_table = 'cb_funding_rounds'
 
+
+class CbInvestments(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    #funding_round_id = models.BigIntegerField()
+    #funded_object_id = models.CharField(max_length=64)
+    #investor_object_id = models.CharField(max_length=64)
+    funding_round = models.ForeignKey(CbFundingRounds, related_name='RNinvestments')
+    funded_object = models.ForeignKey(CbObjects, related_name='RNfunded')
+    investor_object = models.ForeignKey(CbObjects, related_name='RNinvesting')
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'cb_investments'
+
+
+class CbIpos(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    ipo_id = models.BigIntegerField()
+    #object_id = models.CharField(max_length=64)
+    object = models.ForeignKey(CbObjects)
+    valuation_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    valuation_currency_code = models.CharField(max_length=16, blank=True, null=True)
+    raised_amount = models.DecimalField(max_digits=15, decimal_places=0, blank=True, null=True)
+    raised_currency_code = models.CharField(max_length=16, blank=True, null=True)
+    public_at = models.DateField(blank=True, null=True)
+    stock_symbol = models.CharField(max_length=32, blank=True, null=True)
+    source_url = models.CharField(max_length=255, blank=True, null=True)
+    source_description = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'cb_ipos'
+
+
+class CbMilestones(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    #object_id = models.CharField(max_length=64)
+    object = models.ForeignKey(CbObjects)
+    milestone_at = models.DateField(blank=True, null=True)
+    milestone_code = models.CharField(max_length=32, blank=True, null=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    source_url = models.CharField(max_length=255, blank=True, null=True)
+    source_description = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'cb_milestones'
+
+
+class CbDegrees(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    #object_id = models.CharField(max_length=64)
+    object = models.ForeignKey(CbObjects, related_name='RNeducation')
+    degree_type = models.CharField(max_length=32)
+    subject = models.CharField(max_length=255, blank=True, null=True)
+    institution = models.CharField(max_length=64, blank=True, null=True)
+    graduated_at = models.DateField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'cb_degrees'
+
+
 class CbOffices(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.CharField(max_length=64)
+    #object_id = models.CharField(max_length=64)
+    object = models.ForeignKey(CbObjects)
     office_id = models.BigIntegerField()
     description = models.CharField(max_length=255, blank=True, null=True)
     region = models.CharField(max_length=255, blank=True, null=True)
@@ -206,7 +215,8 @@ class CbOffices(models.Model):
 
 class CbPeople(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    object_id = models.CharField(unique=True, max_length=64)
+    #object_id = models.CharField(unique=True, max_length=64)
+    object = models.ForeignKey(CbObjects)
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     birthplace = models.CharField(max_length=128, blank=True, null=True)
@@ -219,8 +229,10 @@ class CbPeople(models.Model):
 class CbRelationships(models.Model):
     id = models.BigIntegerField(primary_key=True)
     relationship_id = models.BigIntegerField()
-    person_object_id = models.CharField(max_length=64)
-    relationship_object_id = models.CharField(max_length=64)
+    #person_object_id = models.CharField(max_length=64)
+    #relationship_object_id = models.CharField(max_length=64)
+    person_object = models.ForeignKey(CbObjects, related_name='RNemployers')
+    relationship_object = models.ForeignKey(CbObjects, related_name='RNemployees')
     start_at = models.DateField(blank=True, null=True)
     end_at = models.DateField(blank=True, null=True)
     is_past = models.IntegerField(blank=True, null=True)
